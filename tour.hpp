@@ -10,5 +10,7 @@ class tour {
 private:
     list<city> locations;
     int fitness;
+public:
+    tour(list<city> locations, int fitness);
 };
 

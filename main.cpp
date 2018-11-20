@@ -20,7 +20,7 @@ list<city> makeCityList(int size) {
     return mix;
 }
 
-void printCities(list<city> &cities) {
+void printCities(list<city> cities) {
     list<city>::iterator cityIT;
     for (cityIT = cities.begin(); cityIT != cities.end(); ++cityIT) {
         cout << (*cityIT);
@@ -35,45 +35,40 @@ list<city> mixCities(list<city> cities) {
     return mixed;
 }
 
-long calculateDistance(city city1, city city2) {
-    //Distance =(x2−x1)2+(y2−y1)2
-    long distance = 0.0;
-    long part1 = abs(pow((city2.getX() - city1.getX()), 2));
-    long part2 = abs(pow((city2.getY() - city1.getY()), 2));
-    distance = abs((sqrt(part1 + part2)));
-    return distance;
-}
-
-long calculateScore(list<city> list1) {
-    long score = 0.0;
-    //Distance =(x2−x1)2+(y2−y1)2
-    long distance = 0.0;
-    list<city>::iterator it1;
-    list<city>::iterator it2;
-    for (it1 = list1.begin(), it2 = ++list1.begin(); it2 != list1.end(); ++it1, ++it2) {
-        distance = calculateDistance(*it1,*it2);
-        score += distance;
+tour findBestTour(list<tour> tours){
+    tour best = tours.front();
+    list<tour>::iterator it1;
+    for (it1 = tours.begin(); it1 != tours.end(); ++it1) {
+        if(it1 ->getFitness() < best.getFitness()){
+            best = *it1;
+        }
     }
-    return score;
+    return best;
 }
-
 
 int main() {
     list<city> list1 = makeCityList(10);
-    city a{'A',0,0};
-    city b{'B',5,5};
+    tour tour1{list1};
     cout << "City info:" << "\n" << endl;
-   // printCities(list1);
-    cout << "Distance of list1: " << calculateScore(list1) << endl;
+    //printCities(tour1.getLocations());
+    cout << "Distance of list1: " << tour1.getFitness()<< endl;
     cout << "----" << endl;
     list<city> mix1 = mixCities(list1);
-    //printCities(mix1);
-    cout << "Distance of mix1: " << calculateScore(mix1)<<endl;
+    tour tour2{mix1};
+   // printCities(tour2.getLocations());
+    cout << "Distance of mix1: " << tour2.getFitness()<<endl;
     cout << "----" << endl;
     list<city> mix2 = mixCities(list1);
-    //printCities(mix2);
-    cout << "Distance of mix2: " << calculateScore(mix2)<<endl;
+    tour tour3{mix2};
+    //printCities(tour3.getLocations());
+    cout << "Distance of mix2: " << tour3.getFitness()<<endl;
     cout << "----" << endl;
-    cout << "Distance between city1 and city2: " << calculateDistance(a,b);
+    list<tour> tourList;
+    tourList.push_back(tour1);
+    tourList.push_back(tour2);
+    tourList.push_back(tour3);
+    tour bestTour = findBestTour(tourList);
+    cout<<"Best Tour score: "<< bestTour.getFitness();
+
     return 0;
 }

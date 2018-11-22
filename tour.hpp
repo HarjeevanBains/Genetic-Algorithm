@@ -9,7 +9,7 @@ using namespace std;
 class tour {
 private:
     list<city> locations;
-    int fitness;
+    double fitness;
 public:
     tour(list<city> locations);
 
@@ -17,7 +17,7 @@ public:
 
     int getFitness() const;
 
-    tour(list<city> locations, int fitness);
+    tour(list<city> locations, double fitness);
 
     long calculateFitness(list<city> list1);
 

@@ -36,13 +36,14 @@ list<city> mixCities(list<city> cities) {
 }
 
 tour findBestTour(list<tour> tours){
+    tours.sort();
     tour best = tours.front();
-    list<tour>::iterator it1;
+    /**list<tour>::iterator it1;
     for (it1 = tours.begin(); it1 != tours.end(); ++it1) {
         if(it1 ->getFitness() < best.getFitness()){
             best = *it1;
         }
-    }
+    }**/
     return best;
 }
 

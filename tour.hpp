@@ -11,16 +11,18 @@ private:
     list<city> locations;
     int fitness;
 public:
+    tour(list<city> locations);
+
     const list<city> &getLocations() const;
 
     int getFitness() const;
 
     tour(list<city> locations, int fitness);
 
-    tour(list<city> locations);
-
     long calculateFitness(list<city> list1);
 
     long calculateDistance(city city1, city city2);
+
+    friend bool operator<(const tour& lhs, const tour& rhs);
 };
 

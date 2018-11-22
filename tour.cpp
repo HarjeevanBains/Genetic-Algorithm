@@ -39,3 +39,7 @@ long tour::calculateDistance(city city1, city city2) {
     distance = fabs((sqrt(part1 + part2)));
     return distance;
 }
+
+bool operator<(const tour& lhs, const tour& rhs){
+    return (lhs.getFitness() < rhs.getFitness());
+}

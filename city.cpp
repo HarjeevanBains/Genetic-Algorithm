@@ -1,12 +1,12 @@
 #include "city.hpp"
 
-city::city(char place, double a, double b) {
+city::city(string place, double a, double b) {
     name = place;
     x = a;
     y = b;
 }
 
-const char &city::getName() const {
+const string &city::getName() const {
     return name;
 }
 
@@ -20,8 +20,15 @@ double city::getY() const {
 
 ostream &operator<<(ostream &os, const city &m) {
     os << "CITY: " << m.name << endl;
-    os << "X:" << m.x << endl;
-    os << "Y:" << m.y << endl;
-    os<<"\n";
+   // os << "X:" << m.x << endl;
+    //os << "Y:" << m.y << endl;
+   // os<<"\n";
     return os;
+}
+
+bool operator==(const city& lhs, const city& rhs){
+    if(lhs.getName() == rhs.getName()){
+        return true;
+    }
+    return false;
 }

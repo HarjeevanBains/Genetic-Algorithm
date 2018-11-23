@@ -7,14 +7,15 @@ using namespace std;
 class city {
 private:
     double x, y;
-    char name;
+    string name;
 public:
-    city(char name, double x, double y);
+    city(string name, double x, double y);
 
     double getX() const;
     double getY() const;
-    const char &getName() const;
+    const string &getName() const;
 
     friend ostream &operator<<(ostream &os, const city &m);
+    friend bool operator==(const city& lhs, const city& rhs);
 };
 

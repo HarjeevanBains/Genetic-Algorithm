@@ -24,5 +24,6 @@ public:
     long calculateDistance(city city1, city city2);
 
     friend bool operator<(const tour& lhs, const tour& rhs);
+    friend bool operator==(const tour& lhs, const tour& rhs);
 };
 

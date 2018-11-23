@@ -43,3 +43,10 @@ long tour::calculateDistance(city city1, city city2) {
 bool operator<(const tour& lhs, const tour& rhs){
     return (lhs.getFitness() < rhs.getFitness());
 }
+
+ bool operator==(const tour& lhs, const tour& rhs){
+    if(lhs.getLocations() == rhs.getLocations()){
+        return true;
+    }
+     return false;
+}

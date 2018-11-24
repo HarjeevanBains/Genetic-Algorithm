@@ -50,3 +50,7 @@ bool operator<(const tour& lhs, const tour& rhs){
     }
      return false;
 }
+
+bool operator!=(const tour& lhs, const tour& rhs){
+    return !operator==(lhs, rhs);
+}

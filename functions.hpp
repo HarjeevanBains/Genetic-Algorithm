@@ -10,6 +10,8 @@ constexpr int CITIES_IN_TOUR = 10;
 constexpr int POPULATION_SIZE = 32;
 constexpr int PARENT_POOL_SIZE = 5;
 constexpr int NUMBER_OF_PARENTS = 2;
+constexpr double IMPROVEMENT_FACTOR = .9;
+constexpr int MUTATION_RATE = 5;//Whole number as percent
 
 using namespace std;
 
@@ -25,8 +27,8 @@ int generateIndex(int min, int max) {
     return distribution(generator1);
 }
 
-vector<int> generateMixPoints() {
-    vector<int> points;
+vector<unsigned int> generateMixPoints() {
+    vector<unsigned int> points;
     points.push_back(generateIndex(1, CITIES_IN_TOUR - 1));
     for (int i = 1; i < NUMBER_OF_PARENTS - 1; i++) {
         points.push_back(generateIndex(points[i - 1] + 1, CITIES_IN_TOUR - 1));
@@ -115,47 +117,19 @@ tour randomTourFromList(list<tour> population) {
     return result;
 }
 
-list<city> combiner(tour tour1, tour tour2, int mixer) {
-    int counter = 0;
-    list<city> cities1 = tour1.getLocations();
-    list<city> cities2 = tour2.getLocations();
-    list<city> newCities;
-    list<city>::iterator cityIT1;
-    list<city>::iterator cityIT2;
-    for (cityIT1 = cities1.begin(); counter < mixer; ++cityIT1) {
-        newCities.push_back(*cityIT1);
-        counter++;
-    }
-    counter = 0;
-    for (cityIT2 = cities2.begin(); cityIT2 != cities2.end(); ++cityIT2) {
-        counter++;
-        bool found = (std::find(newCities.begin(), newCities.end(), *cityIT2) != newCities.end());
-        if ((counter > mixer) && !found) {
-            newCities.push_back(*cityIT2);
-        }
-    }
-    for (cityIT2 = cities2.begin(); cityIT2 != cities2.end(); ++cityIT2) {
-        bool found = (std::find(newCities.begin(), newCities.end(), *cityIT2) != newCities.end());
-        if (!found) {
-            newCities.push_back(*cityIT2);
-        }
-    }
-    return newCities;
-
-}
 
 vector<list<city>> cityFromTour(vector<tour> bestTours) {
     vector<list<city>> citiesVector;
-    for (int i = 0; i < bestTours.size(); i++) {
+    for (unsigned int i = 0; i < bestTours.size(); i++) {
         citiesVector.push_back(bestTours[i].getLocations());
     }
     return citiesVector;
 }
 
-list<city> combiner1(vector<list<city>> bestTours, vector<int> mixers) {
-    int counter = 0;
-    int start = 0;
-    int listSize = bestTours[0].size();
+list<city> combiner1(vector<list<city>> bestTours, vector<unsigned int> mixers) {
+    unsigned int counter = 0;
+    unsigned int start = 0;
+    unsigned int listSize = bestTours[0].size();
     list<city> newCities;
 
     vector<vector<city>> copyVector;
@@ -184,7 +158,7 @@ list<city> combiner1(vector<list<city>> bestTours, vector<int> mixers) {
             if (!found) {
                 newCities.push_back(copyVector[counter][start]);
             }
-            if (start < listSize-1) {
+            if (start < listSize - 1) {
                 start++;
             } else {
                 start = 0;
@@ -195,33 +169,6 @@ list<city> combiner1(vector<list<city>> bestTours, vector<int> mixers) {
 
 }
 
-/**
-tour combineTwoTours(list<tour> allTours) {
-    int mixer = generateIndex();
-    //int counter = 0;
-    tour parent1 = allTours.back();
-    allTours.pop_back();
-    tour parent2 = allTours.back();
-    allTours.pop_back();
-
-    list<city> cities1 = parent1.getLocations();
-    list<city> cities2 = parent2.getLocations();
-    list<city> newCities = combiner(cities1, cities2, mixer);
-
-    tour newTour{newCities};
-    cout << "Mix Index: " << mixer << endl;
-    cout << "Parent1: " << parent1.getFitness() << endl;
-    printCities(parent1.getLocations());
-    cout << "---" << endl;
-    cout << "Parent2: " << parent2.getFitness() << endl;
-    printCities(parent2.getLocations());
-    cout << "---" << endl;
-    cout << "Child: " << newTour.getFitness() << endl;
-    printCities(newTour.getLocations());
-    return newTour;
-
-}
-**/
 vector<list<tour>> generateParentPools(list<tour> allTours) {
     int counter = 0;
     vector<list<tour>> myParents;
@@ -242,13 +189,50 @@ vector<list<tour>> generateParentPools(list<tour> allTours) {
     return myParents;
 }
 
+void swapList(list<city> &input){
+    int randomIndex = generateIndex(0, input.size()-2);
+    vector<city> copyVector{std::begin(input), std::end(input)};
+    city one = copyVector[randomIndex];
+    city two = copyVector[randomIndex+1];
+    copyVector[randomIndex] = two;
+    copyVector[randomIndex+1] = one;
+    copy(copyVector.begin(), copyVector.end(), std::back_inserter(input));
+    cout<<"Mutated"<<endl;
+}
+
+tour mutate(tour input) {
+    list<city> inputTourCities = input.getLocations();
+    int randomCheck = generateIndex(1, 100);
+    vector<int> mutationSizePool;
+
+    while (mutationSizePool.size() < MUTATION_RATE) {
+        int random = generateIndex(1, 100);
+        bool found = (std::find(mutationSizePool.begin(), mutationSizePool.end(), random) !=
+                      mutationSizePool.end());
+        if (!found) {
+            mutationSizePool.push_back(random);
+        }
+    }
+
+    bool contains = (std::find(mutationSizePool.begin(), mutationSizePool.end(), randomCheck) !=
+                     mutationSizePool.end());
+    if (contains) {
+        swapList(inputTourCities);
+        tour output{inputTourCities};
+        return output;
+    }
+
+    return input;
+}
+
 tour combineTwoTours1(list<tour> allTours) {
-    vector<int> mixer = generateMixPoints();
+    vector<unsigned int> mixer = generateMixPoints();
     vector<list<tour>> allParents = generateParentPools(allTours);
     vector<tour> bestToursFromParentsABC;
     for (int i = 0; i < NUMBER_OF_PARENTS; i++) {
         bool contain = (
-                std::find(bestToursFromParentsABC.begin(), bestToursFromParentsABC.end(), (findBestTour(allParents[i]))) !=
+                std::find(bestToursFromParentsABC.begin(), bestToursFromParentsABC.end(),
+                          (findBestTour(allParents[i]))) !=
                 bestToursFromParentsABC.end());
         if (!contain) {
             bestToursFromParentsABC.push_back(findBestTour(allParents[i]));
@@ -260,22 +244,24 @@ tour combineTwoTours1(list<tour> allTours) {
     vector<list<city>> citiesList = cityFromTour(bestToursFromParentsABC);
     list<city> newCities = combiner1(citiesList, mixer);
     tour newTour{newCities};
-
+/**
     cout << "I didn't crash!" << endl;
 
     cout << "INDEX'S : ";
-    for (int k = 0; k < mixer.size(); k++) {
+    for (unsigned int k = 0; k < mixer.size(); k++) {
         cout << mixer[k] << ", ";
     }
     cout << " " << endl;
     cout << "---" << endl;
-    for (int j = 0; j < citiesList.size(); j++) {
+    for (unsigned int j = 0; j < citiesList.size(); j++) {
         cout << "PARENT: " << (j + 1) << endl;
         printCities(citiesList[j]);
         cout << "---" << endl;
     }
     cout << "Child: " << newTour.getFitness() << endl;
     printCities(newTour.getLocations());
+    **/
+    newTour = mutate(newTour);
     return newTour;
 
 }

@@ -2,13 +2,14 @@
 
 #include <random>
 #include <algorithm>
+#include <vector>
 #include "tour.hpp"
 
 
 constexpr int CITIES_IN_TOUR = 10;
 constexpr int POPULATION_SIZE = 32;
 constexpr int PARENT_POOL_SIZE = 5;
-constexpr int NUMBER_OF_PARENTS = 3;
+constexpr int NUMBER_OF_PARENTS = 2;
 
 using namespace std;
 
@@ -156,23 +157,37 @@ list<city> combiner1(vector<list<city>> bestTours, vector<int> mixers) {
     int start = 0;
     int listSize = bestTours[0].size();
     list<city> newCities;
-    list<city>::iterator cityIT1;
+
+    vector<vector<city>> copyVector;
+
+    for (int i = 0; copyVector.size() < bestTours.size(); i++) {
+        vector<city> copyVectorInitial{std::begin(bestTours[i]), std::end(bestTours[i])};
+        copyVector.push_back(copyVectorInitial);
+    }
+
+
     while (counter < mixers.size()) {
-        for (cityIT1 = bestTours[counter].begin(); start < mixers[counter]; ++cityIT1) {
-            bool found = (std::find(newCities.begin(), newCities.end(), *cityIT1) != newCities.end());
+        for (int i = start; start < mixers[counter]; ++i) {
+            bool found = (std::find(newCities.begin(), newCities.end(), copyVector[counter][start]) != newCities.end());
             if (!found) {
-                newCities.push_back(*cityIT1);
+                newCities.push_back(copyVector[counter][start]);
                 //start++;
             }
             start++;
         }
         counter++;
     }
+
     while (newCities.size() < listSize) {
-        for (cityIT1 = bestTours[counter].begin(); newCities.size() < listSize; ++cityIT1) {
-            bool found = (std::find(newCities.begin(), newCities.end(), *cityIT1) != newCities.end());
+        for (int i = start; newCities.size() < listSize; i++) {
+            bool found = (std::find(newCities.begin(), newCities.end(), copyVector[counter][start]) != newCities.end());
             if (!found) {
-                newCities.push_back(*cityIT1);
+                newCities.push_back(copyVector[counter][start]);
+            }
+            if (start < listSize-1) {
+                start++;
+            } else {
+                start = 0;
             }
         }
     }
@@ -230,29 +245,35 @@ vector<list<tour>> generateParentPools(list<tour> allTours) {
 tour combineTwoTours1(list<tour> allTours) {
     vector<int> mixer = generateMixPoints();
     vector<list<tour>> allParents = generateParentPools(allTours);
-    vector<tour> bestToursFromParents;
+    vector<tour> bestToursFromParentsABC;
     for (int i = 0; i < NUMBER_OF_PARENTS; i++) {
-        bool contain =
-                std::find(bestToursFromParents.begin(), bestToursFromParents.end(), (findBestTour(allParents[i]))) !=
-                bestToursFromParents.end();
+        bool contain = (
+                std::find(bestToursFromParentsABC.begin(), bestToursFromParentsABC.end(), (findBestTour(allParents[i]))) !=
+                bestToursFromParentsABC.end());
         if (!contain) {
-            bestToursFromParents.push_back(findBestTour(allParents[i]));
+            bestToursFromParentsABC.push_back(findBestTour(allParents[i]));
         } else {
-            bestToursFromParents.push_back(findSecondBestTour(allParents[i]));
+            bestToursFromParentsABC.push_back(findSecondBestTour(allParents[i]));
         }
     }
 
-    vector<list<city>> citiesList = cityFromTour(bestToursFromParents);
+    vector<list<city>> citiesList = cityFromTour(bestToursFromParentsABC);
     list<city> newCities = combiner1(citiesList, mixer);
     tour newTour{newCities};
+
     cout << "I didn't crash!" << endl;
-    /** cout << "Mix Index: " << mixer << endl;
-     cout << "Parent1: " << parent1.getFitness() << endl;
-     printCities(parent1.getLocations());
-     cout << "---" << endl;
-     cout << "Parent2: " << parent2.getFitness() << endl;
-     printCities(parent2.getLocations());
-     cout << "---" << endl;**/
+
+    cout << "INDEX'S : ";
+    for (int k = 0; k < mixer.size(); k++) {
+        cout << mixer[k] << ", ";
+    }
+    cout << " " << endl;
+    cout << "---" << endl;
+    for (int j = 0; j < citiesList.size(); j++) {
+        cout << "PARENT: " << (j + 1) << endl;
+        printCities(citiesList[j]);
+        cout << "---" << endl;
+    }
     cout << "Child: " << newTour.getFitness() << endl;
     printCities(newTour.getLocations());
     return newTour;

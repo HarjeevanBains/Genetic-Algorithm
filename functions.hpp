@@ -197,7 +197,6 @@ void swapList(list<city> &input){
     copyVector[randomIndex] = two;
     copyVector[randomIndex+1] = one;
     copy(copyVector.begin(), copyVector.end(), std::back_inserter(input));
-    cout<<"Mutated"<<endl;
 }
 
 tour mutate(tour input) {

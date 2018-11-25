@@ -54,3 +54,8 @@ bool operator<(const tour& lhs, const tour& rhs){
 bool operator!=(const tour& lhs, const tour& rhs){
     return !operator==(lhs, rhs);
 }
+
+ostream &operator<<(ostream &os, const tour &m){
+    os<<"Fitness: "<< m.getFitness()<<endl;
+    return os;
+}

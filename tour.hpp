@@ -26,5 +26,7 @@ public:
     friend bool operator<(const tour& lhs, const tour& rhs);
     friend bool operator==(const tour& lhs, const tour& rhs);
     friend bool operator!=(const tour& lhs, const tour& rhs);
+    friend ostream &operator<<(ostream &os, const tour &m);
+
 };
 

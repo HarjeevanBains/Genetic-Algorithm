@@ -10,7 +10,7 @@ constexpr int CITIES_IN_TOUR = 10;
 constexpr int POPULATION_SIZE = 32;
 constexpr int PARENT_POOL_SIZE = 5;
 constexpr int NUMBER_OF_PARENTS = 2;
-constexpr double IMPROVEMENT_FACTOR = .7;
+constexpr double IMPROVEMENT_FACTOR = .88;
 constexpr int MUTATION_RATE = 5;//Whole number as percent
 
 using namespace std;

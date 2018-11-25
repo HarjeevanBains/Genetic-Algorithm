@@ -56,6 +56,6 @@ bool operator!=(const tour& lhs, const tour& rhs){
 }
 
 ostream &operator<<(ostream &os, const tour &m){
-    os<<"Fitness: "<< m.getFitness()<<endl;
+    os<<"Fitness: "<< m.getFitness();
     return os;
 }

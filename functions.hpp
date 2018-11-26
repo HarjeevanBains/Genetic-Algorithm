@@ -10,7 +10,7 @@ constexpr int CITIES_IN_TOUR = 32;
 constexpr int POPULATION_SIZE = 32;
 constexpr int PARENT_POOL_SIZE = 5;
 constexpr int NUMBER_OF_PARENTS = 3;
-constexpr double IMPROVEMENT_FACTOR = .85;
+constexpr double IMPROVEMENT_FACTOR = .85;//Percent of original distance
 constexpr int MUTATION_RATE = 5;//Whole number as percent
 
 using namespace std;
@@ -189,13 +189,13 @@ vector<list<tour>> generateParentPools(list<tour> allTours) {
     return myParents;
 }
 
-void swapList(list<city> &input){
-    int randomIndex = generateIndex(0, input.size()-2);
+void swapList(list<city> &input) {
+    int randomIndex = generateIndex(0, input.size() - 2);
     vector<city> copyVector{std::begin(input), std::end(input)};
     city one = copyVector[randomIndex];
-    city two = copyVector[randomIndex+1];
+    city two = copyVector[randomIndex + 1];
     copyVector[randomIndex] = two;
-    copyVector[randomIndex+1] = one;
+    copyVector[randomIndex + 1] = one;
     copy(copyVector.begin(), copyVector.end(), std::back_inserter(input));
 }
 
@@ -243,29 +243,12 @@ tour combineTwoTours1(list<tour> allTours) {
     vector<list<city>> citiesList = cityFromTour(bestToursFromParentsABC);
     list<city> newCities = combiner1(citiesList, mixer);
     tour newTour{newCities};
-/**
-    cout << "I didn't crash!" << endl;
-
-    cout << "INDEX'S : ";
-    for (unsigned int k = 0; k < mixer.size(); k++) {
-        cout << mixer[k] << ", ";
-    }
-    cout << " " << endl;
-    cout << "---" << endl;
-    for (unsigned int j = 0; j < citiesList.size(); j++) {
-        cout << "PARENT: " << (j + 1) << endl;
-        printCities(citiesList[j]);
-        cout << "---" << endl;
-    }
-    cout << "Child: " << newTour.getFitness() << endl;
-    printCities(newTour.getLocations());
-    **/
     newTour = mutate(newTour);
     return newTour;
 
 }
 
-void run(){
+void run() {
     list<city> list1 = makeCityList(CITIES_IN_TOUR);
     list<list<city>> allList = createAllList(list1);
     list<tour> population = createAllTours(allList);
@@ -290,8 +273,9 @@ void run(){
         finalPopulation = newPopulation1;
         newPopulation1.clear();
         counter++;
-        if(counter % 100 == 0){
-            cout<<"Program has run "<<counter<<" times with no result, consider changing the IMPROVEMENT_FACTOR"<<endl;
+        if (counter % 100 == 0) {
+            cout << "Program has run " << counter << " times with no result, consider changing the IMPROVEMENT_FACTOR"
+                 << endl;
         }
     }
     finalPopulation.push_back(elite1);
@@ -304,4 +288,6 @@ void run(){
     cout << "New Elite Tour:" << endl;
     cout << elite2 << endl;
     printCities(elite2.getLocations());
+    cout << "---" << endl;
+    cout << "Iterations to get here: " << counter << endl;
 }
